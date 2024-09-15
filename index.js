@@ -18,22 +18,14 @@ mongoose
 app.use(express.json());
 
 const corsOptions = {
-	origin: (origin, callback) => {
-		const allowedOrigins = ["http://localhost:5173", process.env.CLIENT_URL];
-
-		if (!origin || allowedOrigins.includes(origin)) {
-			callback(null, true);
-		} else {
-			callback(new Error("Not allowed by CORS"));
-		}
-	},
+	origin: isProduction
+		? process.env.CLIENT_URL
+		: ["http://localhost:5173", process.env.CLIENT_URL],
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 	credentials: true,
-	optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
-
 app.use("/api/v1/auth", authRouter);
 
 app.get("/", (req, res) => {

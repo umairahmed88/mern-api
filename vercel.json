@@ -1,24 +1,5 @@
 {
 	"version": 2,
 	"builds": [{ "src": "index.js", "use": "@vercel/node" }],
-	"routes": [
-		{
-			"src": "/(.*)",
-			"dest": "index.js",
-			"headers": [
-				{
-					"key": "Access-Control-Allow-Origin",
-					"value": "https://mern-client-ua.vercel.app"
-				},
-				{
-					"key": "Access-Control-Allow-Methods",
-					"value": "GET,HEAD,PUT,PATCH,POST,DELETE"
-				},
-				{
-					"key": "Access-Control-Allow-Credentials",
-					"value": "true"
-				}
-			]
-		}
-	]
+	"routes": [{ "src": "/(.*)", "dest": "index.js" }]
 }
