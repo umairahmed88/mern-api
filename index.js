@@ -6,8 +6,6 @@ import authRouter from "./routes/auth.routes.js";
 
 const app = express();
 
-const isProduction = process.env.NODE_ENV === "production";
-
 mongoose
 	.connect(process.env.MONGODB_URI)
 	.then(() => {
@@ -16,16 +14,7 @@ mongoose
 	.catch((err) => console.log("Error connecting to Mongo: ", err));
 
 app.use(express.json());
-
-const corsOptions = {
-	origin: isProduction
-		? process.env.CLIENT_URL
-		: ["http://localhost:5173", process.env.CLIENT_URL],
-	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-	credentials: true,
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use("/api/v1/auth", authRouter);
 
 app.get("/", (req, res) => {
