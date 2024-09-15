@@ -6,7 +6,7 @@ import authRouter from "./routes/auth.routes.js";
 
 const app = express();
 
-const isProduction = process.env.PROD_PORT === "production";
+const isProduction = process.env.NODE_ENV === "production";
 
 mongoose
 	.connect(process.env.MONGODB_URI)
