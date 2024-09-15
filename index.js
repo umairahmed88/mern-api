@@ -17,6 +17,10 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/v1/auth", authRouter);
 
+app.get("/", (req, res) => {
+	res.send("API is running");
+});
+
 app.listen(process.env.DEV_PORT, () => {
 	console.log(`Listening on port ${process.env.DEV_PORT}`);
 });
