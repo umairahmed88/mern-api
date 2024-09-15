@@ -14,16 +14,16 @@ export const signup = async (req, res) => {
 	try {
 		const { username, email, password, confirmPassword, avatar } = req.body;
 
+		if (password !== confirmPassword) {
+			return res.status(400).json({ message: "Passwords do not match." });
+		}
+
 		const isUser = await Auth.findOne({ email });
 		if (isUser) {
 			return res.status(400).json({
 				message:
 					"User with this email already signed up. Please signup with other email.",
 			});
-		}
-
-		if (password !== confirmPassword) {
-			return res.status(400).json({ message: "Passwords do not match." });
 		}
 
 		const hashedPassword = bcryptjs.hashSync(password, 10);
@@ -52,13 +52,6 @@ export const signup = async (req, res) => {
 		};
 
 		await sgmail.send(msg);
-
-		const newUser = new Auth({
-			username,
-			email,
-			password: hashedPassword,
-			avatar,
-		});
 
 		res.status(201).json({
 			message:
