@@ -22,7 +22,7 @@ const corsOptions = {
 		? process.env.CLIENT_URL
 		: ["http://localhost:5173", process.env.CLIENT_URL],
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-	Credentials: true,
+	credentials: true,
 };
 
 app.use(cors(corsOptions));
