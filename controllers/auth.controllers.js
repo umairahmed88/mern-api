@@ -1,6 +1,7 @@
 import Auth from "../models/auth.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import sgmail from "@sendgrid/mail";
 
 const sanitizeUser = (user) => ({
 	id: user._id,
@@ -27,6 +28,31 @@ export const signup = async (req, res) => {
 
 		const hashedPassword = bcryptjs.hashSync(password, 10);
 
+		const verificationToken = jwt.sign(
+			{
+				username,
+				email,
+				password: hashedPassword,
+				avatar,
+			},
+			process.env.JWT_SECRET,
+			{ expiresIn: "1h" }
+		);
+
+		const signupVerificationLink = `${
+			process.env.CLIENT_URL
+		}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+
+		const msg = {
+			to: email,
+			from: process.env.VERIFICATION_EMAIL_FROM,
+			subject: "Verify your email address",
+			text: `Hello ${username}, welcome to our e-commerce web app, please verify email by clicking on the following link: ${signupVerificationLink}`,
+			html: `<p>Hello ${username},</p><p> welcome to our e-commerce web app, please verify email by clicking on the following link:</p><a href="${signupVerificationLink}">Verify Email</a>`,
+		};
+
+		await sgmail.send(msg);
+
 		const newUser = new Auth({
 			username,
 			email,
@@ -34,11 +60,10 @@ export const signup = async (req, res) => {
 			avatar,
 		});
 
-		await newUser.save();
-
-		const sanitizedUser = sanitizeUser(newUser);
-
-		res.status(200).json({ message: "Signup Successful", sanitizedUser });
+		res.status(201).json({
+			message:
+				"Signup Successful! Please check your email to verify your account",
+		});
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
