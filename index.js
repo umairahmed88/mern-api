@@ -13,12 +13,22 @@ mongoose
 	})
 	.catch((err) => console.log("Error connecting to Mongo: ", err));
 
-app.use(
-	cors({
-		origin: ["https://mern-client-ua.vercel.app"],
-		credentials: true,
-	})
-);
+const corsOptions = {
+	origin: (origin, callback) => {
+		const whitelist = [process.env.CLIENT_URL, "http://localhost:5173"];
+		if (whitelist.indexOf(origin) !== -1 || !origin) {
+			callback(null, true);
+		} else {
+			callback(new Error("Not allowed by CORS"));
+		}
+	},
+	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+	credentials: true,
+	optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use("/api/v1/auth", authRouter);
 
