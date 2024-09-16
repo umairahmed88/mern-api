@@ -1,42 +1,45 @@
-import jwt from "jsonwebtoken";
 import Auth from "../models/auth.model.js";
+import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const verifyEmail = async (req, res) => {
-	const { token } = req.query;
-
-	if (!token) {
-		res.status(400).json({ message: "no token provided" });
-	}
 	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		const { token } = req.query;
 
-		const { email, username, password, avatar } = decoded;
-
-		let user = await Auth.findOne({ email });
-
-		if (user) {
-			if (user.email === email) {
-				return res.status(400).json({ message: "Email already verified" });
-			}
-
-			const sanitizedUser = new Auth({
-				username,
-				email,
-				password,
-				avatar: avatar,
-			});
-
-			await sanitizedUser.save();
-			return res.redirect(`${process.env.CLIENT_URL}/signin`);
+		if (!token) {
+			return res.status(400).json("Invalid verification link.");
 		}
 
-		const sanitizedUser = new Auth({ ...decoded, avatar });
+		// Verify JWT token
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-		await sanitizedUser.save();
+		const { username, email, password, avatar } = decoded;
 
-		res.redirect(`${process.env.CLIENT_URL}/signin`);
+		// Check if user already exists in the database (just in case)
+		const isUser = await Auth.findOne({ email });
+		if (isUser) {
+			return res.status(400).json("User already exists or has been verified.");
+		}
+
+		// Hash the password before saving the user
+		const hashedPassword = bcryptjs.hashSync(password, 10);
+
+		// Create and save new user after verification
+		const newUser = new Auth({
+			username,
+			email,
+			password: hashedPassword,
+			avatar,
+			isVerified: true, // Set the user as verified
+		});
+
+		await newUser.save();
+
+		res.status(200).json({
+			message:
+				"Email verified successfully! Your account has been created, you can now sign in.",
+		});
 	} catch (err) {
-		console.error("Error verifying email: ", err.message);
-		res.status(400).json({ message: err.message });
+		res.status(500).json({ message: err.message });
 	}
 };
