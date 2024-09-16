@@ -23,14 +23,14 @@ export const verifyEmail = async (req, res) => {
 				username,
 				email,
 				password,
-				avatar,
+				avatar: avatar,
 			});
 
 			await sanitizedUser.save();
 			return res.redirect(`${process.env.CLIENT_URL}/signin`);
 		}
 
-		const sanitizedUser = new Auth(decoded);
+		const sanitizedUser = new Auth({ ...decoded, avatar });
 
 		await sanitizedUser.save();
 

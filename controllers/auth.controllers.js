@@ -34,7 +34,6 @@ export const signup = async (req, res) => {
 			{
 				username,
 				email,
-				password: hashedPassword,
 				avatar,
 			},
 			process.env.JWT_SECRET,
