@@ -15,7 +15,7 @@ mongoose
 
 app.use(
 	cors({
-		origin: ["https://mern-client-ua.vercel.app/"],
+		origin: ["https://mern-client-ua.vercel.app"],
 		credentials: true,
 	})
 );
