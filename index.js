@@ -13,8 +13,13 @@ mongoose
 	})
 	.catch((err) => console.log("Error connecting to Mongo: ", err));
 
+app.use(
+	cors({
+		origin: ["https://mern-client-ua.vercel.app/"],
+		credentials: true,
+	})
+);
 app.use(express.json());
-app.use(cors());
 app.use("/api/v1/auth", authRouter);
 
 app.get("/", (req, res) => {
