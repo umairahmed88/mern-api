@@ -53,7 +53,7 @@ export const signup = async (req, res) => {
 			html: `<p>Hello ${username},</p><p> welcome to our e-commerce web app, please verify email by clicking on the following link:</p><a href="${signupVerificationLink}">Verify Email</a>`,
 		};
 
-		await sgmail.send(msg);
+		await sgMail.send(msg);
 
 		res.status(201).json({
 			message:
