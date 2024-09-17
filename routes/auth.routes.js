@@ -16,6 +16,6 @@ router.post("/signin", signin);
 router.post("/signin-google", google);
 router.put("/update-user/:id", verifyToken, updateUser);
 router.post("/signout", verifyToken, signout);
-router.get("verify-email", verifyEmail);
+router.get("/verify-email", verifyEmail);
 
 export default router;
