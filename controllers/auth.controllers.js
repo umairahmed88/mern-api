@@ -34,15 +34,14 @@ export const signup = async (req, res) => {
 			{
 				username,
 				email,
+				password: hashedPassword,
 				avatar,
 			},
 			process.env.JWT_SECRET,
 			{ expiresIn: "1h" }
 		);
 
-		const signupVerificationLink = `${
-			process.env.CLIENT_URL
-		}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+		const signupVerificationLink = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
 
 		const msg = {
 			to: email,
