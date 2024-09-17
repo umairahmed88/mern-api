@@ -41,7 +41,9 @@ export const signup = async (req, res) => {
 			{ expiresIn: "1h" }
 		);
 
-		const signupVerificationLink = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
+		const signupVerificationLink = `${
+			process.env.CLIENT_URL
+		}/verify-email?token=${encodeURIComponent(verificationToken)}`;
 
 		const msg = {
 			to: email,
