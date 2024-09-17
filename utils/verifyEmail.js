@@ -21,14 +21,11 @@ export const verifyEmail = async (req, res) => {
 			return res.status(400).json("User already exists or has been verified.");
 		}
 
-		// Hash the password before saving the user
-		const hashedPassword = bcryptjs.hashSync(password, 10);
-
 		// Create and save new user after verification
 		const newUser = new Auth({
 			username,
 			email,
-			password: hashedPassword,
+			password,
 			avatar,
 			isVerified: true, // Set the user as verified
 		});
