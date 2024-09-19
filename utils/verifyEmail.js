@@ -1,13 +1,6 @@
 import Auth from "../models/auth.model.js";
 import jwt from "jsonwebtoken";
 
-const sanitizeUser = (user) => ({
-	id: user._id,
-	username: user.username,
-	email: user.email,
-	avatar: user.avatar,
-});
-
 export const verifyEmail = async (req, res) => {
 	try {
 		const { token } = req.query;
@@ -22,20 +15,9 @@ export const verifyEmail = async (req, res) => {
 		const { username, email, password, avatar } = decoded;
 
 		// Check if user already exists in the database (just in case)
-		const existingUser = await Auth.findOne({ email });
-		if (existingUser) {
-			if (existingUser.isVerified) {
-				return res.status(400).json("This email is already verified.");
-			}
-
-			existingUser.isVerified = true;
-			await existingUser.save();
-
-			const sanitizedUser = sanitizeUser(existingUser);
-
-			return res
-				.status(200)
-				.json({ message: "Email updated and verified.", sanitizedUser });
+		const isUser = await Auth.findOne({ email });
+		if (isUser) {
+			return res.status(400).json("User already exists or has been verified.");
 		}
 
 		// Create and save new user after verification
@@ -44,17 +26,14 @@ export const verifyEmail = async (req, res) => {
 			email,
 			password,
 			avatar,
-			isVerified: true,
+			isVerified: true, // Set the user as verified
 		});
 
 		await newUser.save();
 
-		const sanitizedUser = sanitizeUser(newUser);
-
 		res.status(200).json({
 			message:
 				"Email verified successfully! Your account has been created, you can now sign in.",
-			sanitizedUser,
 		});
 	} catch (err) {
 		res.status(500).json({ message: err.message });
