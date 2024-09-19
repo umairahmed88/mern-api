@@ -1,5 +1,4 @@
 import Auth from "../models/auth.model.js";
-import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const verifyEmail = async (req, res) => {
