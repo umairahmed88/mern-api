@@ -41,7 +41,7 @@ export const signup = async (req, res) => {
 			{ expiresIn: "1h" }
 		);
 
-		const signupVerificationLink = `${
+		const verificationLink = `${
 			process.env.CLIENT_URL
 		}/verify-email?token=${encodeURIComponent(verificationToken)}`;
 
@@ -49,8 +49,8 @@ export const signup = async (req, res) => {
 			to: email,
 			from: process.env.VERIFICATION_EMAIL_FROM,
 			subject: "Verify your email address",
-			text: `Hello ${username}, welcome to our e-commerce web app, please verify email by clicking on the following link: ${signupVerificationLink}`,
-			html: `<p>Hello ${username},</p><p> welcome to our e-commerce web app, please verify email by clicking on the following link:</p><a href="${signupVerificationLink}">Verify Email</a>`,
+			text: `Hello ${username}, welcome to our e-commerce web app, please verify email by clicking on the following link: ${verificationLink}`,
+			html: `<p>Hello ${username},</p><p> welcome to our e-commerce web app, please verify email by clicking on the following link:</p><a href="${verificationLink}">Verify Email</a>`,
 		};
 
 		await sgMail.send(msg);
@@ -70,11 +70,9 @@ export const signin = async (req, res) => {
 
 		const user = await Auth.findOne({ email });
 		if (!user) {
-			return res
-				.status(404)
-				.json({
-					message: "User not found. Please enter a valid email address.",
-				});
+			return res.status(404).json({
+				message: "User not found. Please enter a valid email address.",
+			});
 		}
 
 		const isValidPassword = bcryptjs.compareSync(password, user.password);
@@ -167,6 +165,36 @@ export const updateUser = async (req, res) => {
 					message: `Email ${newEmail} is already signed up, try another email.`,
 				});
 			}
+
+			const verificationToken = jwt.sign(
+				{
+					username: user.username,
+					email: newEmail,
+					password: user.password,
+					avatar: user.avatar,
+				},
+				process.env.JWT_SECRET,
+				{ expiresIn: "1h" }
+			);
+
+			const verificationLink = `${
+				process.env.CLIENT_URL
+			}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+
+			const msg = {
+				to: newEmail,
+				from: process.env.VERIFICATION_EMAIL_FROM,
+				subject: "Verify your new email address",
+				text: `Hello ${user.username}, please verify your new email address by clicking the following link: ${verificationLink}`,
+				html: `<p>Hello ${user.username},</p><p>Please verify your new email address by clicking the following link:</p><a href="${verificationLink}">Verify Email</a>`,
+			};
+
+			await sgMail.send(msg);
+
+			return res.status(200).json({
+				message:
+					"An email has been sent to your new email address. Please verify your new email address to complete the update.",
+			});
 		}
 
 		if (password) {
