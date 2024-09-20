@@ -19,10 +19,10 @@ export const verifyEmail = async (req, res) => {
 		// Verify JWT token
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-		const { username, email: newEmail, password, avatar } = decoded;
+		const { id, username, email: newEmail, password, avatar } = decoded;
 
 		// Check if user already exists in the database (just in case)
-		const existingUser = await Auth.findOne({ email: newEmail });
+		const existingUser = await Auth.findById(id);
 		if (existingUser) {
 			// Email update scenario: Update user's email
 			if (!existingUser.isVerified || existingUser.email !== newEmail) {
