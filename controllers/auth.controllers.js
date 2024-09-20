@@ -168,6 +168,7 @@ export const updateUser = async (req, res) => {
 
 			const verificationToken = jwt.sign(
 				{
+					id: user._id,
 					username: user.username,
 					email: newEmail,
 					password: user.password,
