@@ -12,13 +12,12 @@ const productSchema = new mongoose.Schema(
 		brand: { type: String },
 		manufacturerPartNumber: { type: String },
 		countryOfOrigin: { type: String },
-		imageUrls: [
-			{
-				type: String,
-				default:
-					"https://wallpapers.com/images/high/beautiful-hd-flowers-in-a-vase-y15tgmdmq9vgvvbz.webp",
-			},
-		],
+		imageUrls: {
+			type: [String],
+			default: [
+				"https://wallpapers.com/images/high/beautiful-hd-flowers-in-a-vase-y15tgmdmq9vgvvbz.webp",
+			],
+		},
 		specifications: [
 			{
 				size: String,
@@ -41,6 +40,6 @@ const productSchema = new mongoose.Schema(
 	}
 );
 
-const Product = mongoose.models("productsMernTwo", productSchema);
+const Product = mongoose.model("productsMernTwo", productSchema);
 
 export default Product;

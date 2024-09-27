@@ -3,6 +3,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
+import productsRouter from "./routes/product.routes.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/products", productsRouter);
 
 app.get("/", (req, res) => {
 	res.send("API is running");
