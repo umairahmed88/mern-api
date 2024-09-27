@@ -4,10 +4,11 @@ import {
 	getAllProducts,
 	getOne,
 } from "../controllers/product.controllers.js";
+import { verifyToken } from "../utils/verifyAuth.js";
 
 const router = express.Router();
 
-router.post("/create-product", createProduct);
+router.post("/create-product", verifyToken, createProduct);
 router.get("/get-one-product", getOne);
 router.get("/get-all-products", getAllProducts);
 
