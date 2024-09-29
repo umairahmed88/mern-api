@@ -27,15 +27,17 @@ export const getAllProducts = async (req, res) => {
 		const products = await Product.find({});
 		const totalProducts = products.length;
 
-		return products
+		return products.length > 0
 			? res.status(200).json({
 					message:
 						totalProducts === 1
 							? `There is ${totalProducts} product available`
-							: `There are ${totalProducts} available`,
+							: `There are ${totalProducts} products available`,
 					products,
 			  })
-			: res.status(404).json({ message: "There is no available product" });
+			: res
+					.status(200)
+					.json({ message: "There are no products available", products: [] });
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
