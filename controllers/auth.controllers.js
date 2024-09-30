@@ -95,6 +95,50 @@ export const signin = async (req, res) => {
 	}
 };
 
+export const forgotPassword = async (req, res) => {
+	try {
+		const { email } = req.body;
+
+		const user = await Auth.findOne({ email });
+
+		if (!user) {
+			return res
+				.status(404)
+				.json({ message: "Please signup, you have not signed up" });
+		}
+
+		const resetPasswordToken = jwt.sign(
+			{ id: user._id },
+			process.env.JWT_SECRET,
+			{
+				expiresIn: "20m",
+			}
+		);
+
+		const resetPasswordVerificationLink = `${
+			process.env.CLIENT_URL
+		}/reset-password?token=${encodeURIComponent(resetPasswordToken)}`;
+
+		const msg = {
+			to: email,
+			from: VERIFICATION_EMAIL_FROM,
+			subject: "Password Reset Request",
+			html: `<p>Hello ${user.username}, <p>
+			<p>You requested to reset your password. Please click the link below to reset your password: <p>
+			<a href="${resetPasswordVerificationLink}">Reset Password</a>
+			<p>If you did not request this, please ignore this email.</p>`,
+		};
+
+		await sgMail(msg);
+
+		res
+			.status(200)
+			.json({ message: "Password reset link has been sent to your email." });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
 export const google = async (req, res) => {
 	try {
 		const { email, name, avatar } = req.body;
