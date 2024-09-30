@@ -121,7 +121,7 @@ export const forgotPassword = async (req, res) => {
 
 		const msg = {
 			to: email,
-			from: VERIFICATION_EMAIL_FROM,
+			from: process.env.VERIFICATION_EMAIL_FROM,
 			subject: "Password Reset Request",
 			html: `<p>Hello ${user.username}, <p>
 			<p>You requested to reset your password. Please click the link below to reset your password: <p>
@@ -129,7 +129,7 @@ export const forgotPassword = async (req, res) => {
 			<p>If you did not request this, please ignore this email.</p>`,
 		};
 
-		await sgMail(msg);
+		await sgMail.send(msg);
 
 		res
 			.status(200)
