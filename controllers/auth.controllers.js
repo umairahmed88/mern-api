@@ -71,7 +71,8 @@ export const signin = async (req, res) => {
 		const user = await Auth.findOne({ email });
 		if (!user) {
 			return res.status(404).json({
-				message: "User not found. Please enter a valid email address.",
+				message:
+					"User not found. Please enter a valid email address or signup.",
 			});
 		}
 
