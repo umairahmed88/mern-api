@@ -14,7 +14,7 @@ export const verifyToken = async (req, res, next) => {
 				if (err) {
 					if (err.name === "TokenExpiredError") {
 						return res.status(401).json({
-							message: "Please login again.",
+							message: "Please login.",
 						});
 					}
 
