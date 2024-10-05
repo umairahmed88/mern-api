@@ -59,6 +59,40 @@ export const updateProduct = async (req, res) => {
 	}
 };
 
+export const increaseProduct = async (req, res) => {
+	try {
+		const product = await Product.findById(req.params.id);
+		const totalUnits = product.quantity;
+
+		return product
+			? (product.quantity++,
+			  await product.save(),
+			  res.status(200).json({
+					message: `Quantity of ${product.name} is increased, there are ${totalUnits} available`,
+			  }))
+			: res.status(404).json({ message: "No such product" });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
+export const decreaseProduct = async (req, res) => {
+	try {
+		const product = await Product.findById(req.params.id);
+		const totalUnits = product.quantity;
+
+		return product.quantity > 0
+			? (product.quantity--,
+			  await product.save(),
+			  res.status(200).json({
+					message: `Quantity of ${product.name} is increased, there are ${totalUnits} of ${product.name} available`,
+			  }))
+			: res.status(404).json({ message: "No such product" });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
 export const deleteProduct = async (req, res) => {
 	try {
 		const product = await Product.findByIdAndDelete(req.params.id);
