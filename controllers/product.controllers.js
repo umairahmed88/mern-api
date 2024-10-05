@@ -69,6 +69,7 @@ export const increaseProduct = async (req, res) => {
 			  await product.save(),
 			  res.status(200).json({
 					message: `Quantity of ${product.name} is increased, there are ${totalUnits} available`,
+					product,
 			  }))
 			: res.status(404).json({ message: "No such product" });
 	} catch (err) {
@@ -86,6 +87,7 @@ export const decreaseProduct = async (req, res) => {
 			  await product.save(),
 			  res.status(200).json({
 					message: `Quantity of ${product.name} is increased, there are ${totalUnits} of ${product.name} available`,
+					product,
 			  }))
 			: res.status(404).json({ message: "No such product" });
 	} catch (err) {
