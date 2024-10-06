@@ -8,7 +8,7 @@ export const addToCart = async (req, res) => {
 		const userId = req.user.id;
 
 		if (!userId) {
-			res.status(401).json({
+			return res.status(401).json({
 				message: "Please login or signup for shopping.",
 			});
 		}
@@ -17,6 +17,12 @@ export const addToCart = async (req, res) => {
 
 		if (!product) {
 			return res.status(404).json({ message: "No such product." });
+		}
+
+		if (product.quantity < quantity) {
+			return res.status(400).json({
+				message: `Insufficient stock. Only ${product.quantity} items available.`,
+			});
 		}
 
 		let cartItem = await CartItems.findOne({ userId, productId });
@@ -52,7 +58,12 @@ export const addToCart = async (req, res) => {
 			.status(200)
 			.json({ message: `${product.name} is added to cart`, cartItem });
 	} catch (err) {
-		res.status(500).json({ message: err.message });
+		if (err.message.includes("Insufficient stock")) {
+			return res.status(400).json({ message: err.message });
+		}
+		return res
+			.status(500)
+			.json({ message: "Something went wrong. Please try again." });
 	}
 };
 
