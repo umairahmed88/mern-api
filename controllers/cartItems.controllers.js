@@ -42,7 +42,7 @@ export const addToCart = async (req, res) => {
 				reviews: product.reviews,
 			});
 
-			await CartItems.save();
+			await cartItem.save();
 		}
 
 		product.quantity -= quantity;
