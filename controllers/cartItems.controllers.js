@@ -85,3 +85,71 @@ export const fetchAllItems = async (req, res) => {
 		res.status(500).json({ message: err.message });
 	}
 };
+
+export const deleteItem = async (req, res) => {
+	try {
+		const userId = req.user.id;
+
+		if (!userId) {
+			return res.status(401).json({
+				message: "Please login or signup for shopping.",
+			});
+		}
+
+		const item = await CartItems.findById(req.params.id);
+
+		if (!item) {
+			return res
+				.status(404)
+				.json({ message: "There is no item in your cart." });
+		}
+
+		const product = await Product.findById(item.productId);
+
+		if (!product) {
+			return res.status(404).json({ message: "Product Not Found" });
+		}
+
+		product.quantity += item.quantity;
+		await CartItems.findByIdAndDelete(req.params.id);
+
+		res.status(200).json({ message: "Item is deleted from your cart." });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
+export const clearCart = async (req, res) => {
+	try {
+		const userId = req.user.id;
+
+		if (!userId) {
+			return res.status(401).json({
+				message: "Please login or signup for shopping.",
+			});
+		}
+
+		const items = await CartItems.find({});
+		let totalQuantity = 0;
+
+		for (const item of items) {
+			const product = await Product.findById(item.productId);
+
+			if (!product) {
+				continue;
+			}
+
+			totalQuantity += item.quantity;
+			product.quantity += item.quantity;
+			await product.save();
+		}
+
+		await CartItems.deleteMany();
+
+		res
+			.status()
+			.json({ message: "Your cart has been cleared. Continue shopping." });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
