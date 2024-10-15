@@ -61,6 +61,7 @@ export const addToCart = async (req, res) => {
 		if (err.message.includes("Insufficient stock")) {
 			return res.status(400).json({ message: err.message });
 		}
+
 		return res
 			.status(500)
 			.json({ message: "Something went wrong. Please try again." });
@@ -157,10 +158,12 @@ export const decreaseItem = async (req, res) => {
 
 		if (item.quantity === 0) {
 			await item.deleteOne();
+
 			return res.status(200).json({ message: "Item removed from the cart." });
 		} else {
 			item.availableStock = product.quantity;
 			await item.save();
+
 			return res
 				.status(200)
 				.json({ message: `The quantity of ${item.name} is decreased`, item });
@@ -231,7 +234,7 @@ export const clearCart = async (req, res) => {
 		await CartItems.deleteMany();
 
 		res
-			.status()
+			.status(200)
 			.json({ message: "Your cart has been cleared. Continue shopping." });
 	} catch (err) {
 		res.status(500).json({ message: err.message });
