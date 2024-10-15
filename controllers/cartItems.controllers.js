@@ -173,6 +173,53 @@ export const decreaseItem = async (req, res) => {
 	}
 };
 
+export const updateItemQuantity = async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const { quantity } = req.body;
+
+		if (!userId) {
+			return res.status(401).json({
+				message: "Please login or signup for shopping.",
+			});
+		}
+
+		const item = await CartItems.findById(req.params.id);
+
+		if (!item) {
+			return res
+				.status(404)
+				.json({ message: "There is no such item in your cart." });
+		}
+
+		const product = await Product.findById(item.productId);
+
+		if (!product) {
+			return res.status(404).json({ message: "Product Not Found" });
+		}
+
+		const quantityChange = quantity - item.quantity;
+
+		if (quantityChange > 0 && product.quantity < quantityChange) {
+			return res.status(404).json({ message: "Not enough stock available." });
+		}
+
+		product.quantity -= quantityChange;
+		item.quantity = quantity;
+		item.availableStock = product.quantity;
+
+		await product.save();
+		await item.save();
+
+		return res.status(200).json({
+			message: `The quantity of ${item.name} has been updated to ${quantity}`,
+			item,
+		});
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
 export const deleteItem = async (req, res) => {
 	try {
 		const userId = req.user.id;
