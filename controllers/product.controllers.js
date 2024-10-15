@@ -25,14 +25,13 @@ export const getOne = async (req, res) => {
 export const getAllProducts = async (req, res) => {
 	try {
 		const products = await Product.find({});
-		const totalProducts = products.length;
 
 		return products.length > 0
 			? res.status(200).json({
 					message:
-						totalProducts === 1
-							? `There is ${totalProducts} product available`
-							: `There are ${totalProducts} products available`,
+						products.length === 1
+							? `There is ${products.length} product available`
+							: `There are ${products.length} products available`,
 					products,
 			  })
 			: res
@@ -62,13 +61,12 @@ export const updateProduct = async (req, res) => {
 export const increaseProduct = async (req, res) => {
 	try {
 		const product = await Product.findById(req.params.id);
-		const totalUnits = product.quantity;
 
 		return product
 			? (product.quantity++,
 			  await product.save(),
 			  res.status(200).json({
-					message: `Quantity of ${product.name} is increased, there are ${totalUnits} available`,
+					message: `Quantity of ${product.name} is increased, there are ${product.quantity} available`,
 					product,
 			  }))
 			: res.status(404).json({ message: "No such product" });
@@ -80,13 +78,12 @@ export const increaseProduct = async (req, res) => {
 export const decreaseProduct = async (req, res) => {
 	try {
 		const product = await Product.findById(req.params.id);
-		const totalUnits = product.quantity;
 
 		return product.quantity > 0
 			? (product.quantity--,
 			  await product.save(),
 			  res.status(200).json({
-					message: `Quantity of ${product.name} is decreased, there are ${totalUnits} of ${product.name} available`,
+					message: `Quantity of ${product.name} is decreased, there are ${product.quantity} of ${product.name} available`,
 					product,
 			  }))
 			: res.status(404).json({ message: "No such product" });
