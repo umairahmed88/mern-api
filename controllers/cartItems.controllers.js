@@ -86,6 +86,90 @@ export const fetchAllItems = async (req, res) => {
 	}
 };
 
+export const increaseItem = async (req, res) => {
+	try {
+		const userId = req.user.id;
+
+		if (!userId) {
+			return res.status(401).json({
+				message: "Please login or signup for shopping.",
+			});
+		}
+		const item = await CartItems.findById(req.params.id);
+
+		if (!item) {
+			return res
+				.status(404)
+				.json({ message: "There is no such item in your cart." });
+		}
+
+		const product = await Product.findById(item.productId);
+
+		if (!product) {
+			return res.status(404).json({ message: "Product Not Found" });
+		}
+
+		if (product.quantity <= 0) {
+			return res.status(404).json({ message: "Item not available." });
+		}
+
+		product.quantity--;
+		item.quantity++;
+		item.availableStock = product.quantity;
+		await product.save();
+		await item.save();
+
+		return res
+			.status(200)
+			.json({ message: `The quantity of ${item.name} is increased`, item });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
+export const decreaseItem = async (req, res) => {
+	try {
+		const userId = req.user.id;
+
+		if (!userId) {
+			return res.status(401).json({
+				message: "Please login or signup for shopping.",
+			});
+		}
+		const item = await CartItems.findById(req.params.id);
+
+		if (!item) {
+			return res
+				.status(404)
+				.json({ message: "There is no such item in your cart." });
+		}
+
+		const product = await Product.findById(item.productId);
+
+		if (!product) {
+			return res.status(404).json({ message: "Product Not Found" });
+		}
+
+		item.quantity--;
+		product.quantity++;
+
+		await product.save();
+
+		if (item.quantity === 0) {
+			await item.deleteOne();
+			return res.status(200).json({ message: "Item removed from the cart." });
+		} else {
+			item.availableStock = product.quantity;
+			await item.save();
+			return res
+				.status(200)
+				.json({ message: `The quantity of ${item.name} is decreased`, item });
+		}
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
 export const deleteItem = async (req, res) => {
 	try {
 		const userId = req.user.id;
@@ -101,7 +185,7 @@ export const deleteItem = async (req, res) => {
 		if (!item) {
 			return res
 				.status(404)
-				.json({ message: "There is no item in your cart." });
+				.json({ message: "There is no such item in your cart." });
 		}
 
 		const product = await Product.findById(item.productId);
