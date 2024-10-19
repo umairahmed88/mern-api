@@ -25,6 +25,9 @@ export const addToCart = async (req, res) => {
 			});
 		}
 
+		product.quantity -= quantity;
+		await product.save();
+
 		let cartItem = await CartItems.findOne({ userId, productId });
 
 		if (cartItem) {
@@ -50,9 +53,6 @@ export const addToCart = async (req, res) => {
 
 			await cartItem.save();
 		}
-
-		product.quantity -= quantity;
-		await product.save();
 
 		return res
 			.status(200)
