@@ -6,7 +6,6 @@ export const addToCart = async (req, res) => {
 		const { productId, quantity = 1 } = req.body;
 
 		const userId = req.user.id;
-
 		if (!userId) {
 			return res.status(401).json({
 				message: "Please login or signup for shopping.",
@@ -14,7 +13,6 @@ export const addToCart = async (req, res) => {
 		}
 
 		const product = await Product.findById(productId);
-
 		if (!product) {
 			return res.status(404).json({ message: "No such product." });
 		}
