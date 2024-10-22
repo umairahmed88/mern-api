@@ -1,6 +1,7 @@
 import CartItems from "../models/cartItems.models.js";
 import Order from "../models/orders.model.js";
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
+import stripe from "stripe";
 
 export const createOrder = async (req, res) => {
 	try {

@@ -5,6 +5,7 @@ import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 import productsRouter from "./routes/product.routes.js";
 import cartItemsRouter from "./routes/cartItems.routes.js";
+import ordersRouter from "./routes/orders.routes.js";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/products", productsRouter);
 app.use("/api/v1/cartItems", cartItemsRouter);
+app.use("/api/v1/orders", ordersRouter);
 
 app.get("/", (req, res) => {
 	res.send("API is running");
