@@ -1,7 +1,8 @@
 import CartItems from "../models/cartItems.models.js";
 import Order from "../models/orders.model.js";
-const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import stripe from "stripe";
+
+const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 
 export const createOrder = async (req, res) => {
 	try {
@@ -12,7 +13,7 @@ export const createOrder = async (req, res) => {
 			});
 		}
 
-		const cartItems = CartItems.find({ userId });
+		const cartItems = await CartItems.find({ userId });
 		if (!cartItems || cartItems.length === 0) {
 			return res.status(404).json({ message: "Your cart is empty" });
 		}
@@ -22,7 +23,7 @@ export const createOrder = async (req, res) => {
 				const discount = item.discount || 0;
 				const itemTotal = item.price * item.quantity * (1 - discount / 100);
 				return total + itemTotal;
-			});
+			}, 0);
 		};
 
 		const totalAmount = calculateTotalAmount(cartItems);
@@ -70,10 +71,8 @@ export const createOrder = async (req, res) => {
 			return res.status(201).json(responsePayload);
 		} else if (order.paymentMethod === "Stripe") {
 			const session = await stripeInstance.checkout.sessions.create({
-				payment_method: ["card"],
-				line_items: (
-					await cartItems
-				).map((item) => ({
+				payment_method_types: ["card"],
+				line_items: cartItems.map((item) => ({
 					price_data: {
 						currency: "usd",
 						product_data: {
@@ -101,6 +100,6 @@ export const createOrder = async (req, res) => {
 			return res.status(400).json({ message: "Invalid payment method" });
 		}
 	} catch (err) {
-		res.status(500).json({ message: err.message });
+		return res.status(500).json({ message: err.message });
 	}
 };
