@@ -103,3 +103,52 @@ export const createOrder = async (req, res) => {
 		return res.status(500).json({ message: err.message });
 	}
 };
+
+export const fetchAllOrders = async (req, res) => {
+	try {
+		const orders = await Order.find({});
+		const totalOrders = orders.length;
+
+		return orders
+			? res
+					.status(200)
+					.json({ message: `There are ${totalOrders} orders.`, orders })
+			: res.status(404).json({ message: "No such orders" });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
+export const fetchOneOrder = async (req, res) => {
+	try {
+		const order = await Order.findById(req.params.id);
+
+		return order
+			? res.status(200).json(order)
+			: res.status(404).json({ message: "No such orders" });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
+export const deleteOrder = async (req, res) => {
+	try {
+		const order = await Order.findByIdAndDelete(req.params.id);
+
+		return order
+			? res.status(200).json({ message: "Order deleted successfully" })
+			: res.status(404).json({ message: "Order not found" });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
+export const deleteAllOrders = async (req, res) => {
+	try {
+		await Order.deleteMany();
+
+		res.status(200).json({ message: "All orders deleted successfully" });
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
