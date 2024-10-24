@@ -4,6 +4,15 @@ import stripe from "stripe";
 
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 
+const sanitizeUser = (user) => ({
+	id: user._id,
+	username: user.username,
+	email: user.email,
+	avatar: user.avatar,
+	role: user.role,
+	purchaseHistory: user.purchaseHistory || [],
+});
+
 export const createOrder = async (req, res) => {
 	try {
 		const userId = req.user.id;
@@ -101,6 +110,99 @@ export const createOrder = async (req, res) => {
 		}
 	} catch (err) {
 		return res.status(500).json({ message: err.message });
+	}
+};
+
+export const updateOrder = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const { orderStatus, paymentStatus, deliveryStatus } = req.body;
+
+		const allowedOrderStatus = [
+			"Processing",
+			"Shipped",
+			"Delivered",
+			"Cancelled",
+		];
+
+		const allowedPaymentStatus = ["Paid", "Failed"];
+		const allowedDeliveryStatus = [
+			"Processing",
+			"Dispatched",
+			"Shipped",
+			"Delivered",
+			"Cancelled",
+		];
+
+		const order = await Order.findById(id);
+
+		if (!order) {
+			return res.status(404).json({ message: "Order not found" });
+		}
+
+		if (orderStatus) {
+			if (!allowedOrderStatus.includes(orderStatus)) {
+				return res.status(400).json({ message: "Invalid order status" });
+			}
+			order.orderStatus = orderStatus;
+		}
+
+		if (paymentStatus) {
+			if (!allowedPaymentStatus.includes(paymentStatus)) {
+				return res.status(400).json({ message: "Invalid payment status" });
+			}
+			order.paymentStatus = paymentStatus;
+		}
+
+		if (deliveryStatus) {
+			if (!allowedDeliveryStatus.includes(deliveryStatus)) {
+				return res.status(400).json({ message: "Invalid delivery status" });
+			}
+			order.deliveryStatus = deliveryStatus;
+		}
+
+		const updatedOrder = await order.save();
+
+		let updatedUser = null;
+
+		if (
+			orderStatus === "Delivered" &&
+			paymentStatus === "Paid" &&
+			deliveryStatus === "Delivered"
+		) {
+			updatedUser = await Auth.findOneAndUpdate(
+				{ _id: order.userId },
+				{ $addToSet: { purchaseHistory: id } },
+				{ new: true }
+			)
+				.select("username email avatar role purchaseHistory")
+				.populate({
+					path: "purchaseHistory",
+					populate: {
+						path: "cartItems.productId",
+						select: "name imageUrls",
+					},
+				});
+		}
+
+		res.status(200).json({
+			message: "Order updated successfully!",
+			order: updatedOrder,
+			user: sanitizeUser(
+				await Auth.findById(order.userId)
+					.select("username email avatar role purchaseHistory")
+					.populate({
+						path: "purchaseHistory",
+						populate: {
+							path: "cartItems.productId",
+							select: "name imageUrls",
+						},
+					})
+			),
+		});
+	} catch (err) {
+		res.status(500).json({ message: err.message });
 	}
 };
 
