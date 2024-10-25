@@ -1,3 +1,4 @@
+import Auth from "../models/auth.model.js";
 import CartItems from "../models/cartItems.models.js";
 import Order from "../models/orders.model.js";
 import stripe from "stripe";
