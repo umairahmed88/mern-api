@@ -35,5 +35,3 @@ const Auth = mongoose.model("authMernTwo", authSchema);
 const Admin = Auth.discriminator("adminMernTwo", AdminSchema);
 
 export { Auth, Admin };
-
-export default { Auth, Admin };

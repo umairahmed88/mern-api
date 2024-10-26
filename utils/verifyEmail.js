@@ -16,18 +16,15 @@ export const verifyEmail = async (req, res) => {
 			return res.status(400).json("Invalid verification link.");
 		}
 
-		// Verify JWT token
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
 		const { id, username, email: newEmail, password, avatar } = decoded;
 
-		// Check if user already exists in the database (just in case)
 		const existingUser = await Auth.findById(id);
 		if (existingUser) {
-			// Email update scenario: Update user's email
 			if (!existingUser.isVerified || existingUser.email !== newEmail) {
-				existingUser.email = newEmail; // Update to new email
-				existingUser.isVerified = true; // Mark as verified
+				existingUser.email = newEmail;
+				existingUser.isVerified = true;
 				await existingUser.save();
 
 				const sanitizedUser = sanitizeUser(existingUser);
@@ -41,13 +38,11 @@ export const verifyEmail = async (req, res) => {
 		} else {
 			const newUser = new Auth({
 				username,
-				email: newEmail, // Use new email from token
-				password, // Store hashed password from the token
+				email: newEmail,
+				password,
 				avatar,
-				isVerified: true, // Mark as verified after signup verification
+				isVerified: true,
 			});
-
-			// Create and save new user after verification
 
 			await newUser.save();
 

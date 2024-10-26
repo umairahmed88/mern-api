@@ -1,4 +1,4 @@
-import Auth from "../models/auth.model.js";
+import { Auth } from "../models/auth.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
