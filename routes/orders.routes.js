@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken } from "../utils/verifyAuth.js";
+import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyAuth.js";
 import {
 	createOrder,
 	deleteAllOrders,
@@ -11,11 +11,11 @@ import {
 
 const router = express.Router();
 
-router.post("/create-order", verifyToken, createOrder);
-router.put("/update-order/:id", verifyToken, updateOrder);
-router.get("/get-all", verifyToken, fetchAllOrders);
-router.get("/get-one/:id", verifyToken, fetchOneOrder);
-router.delete("/delete-one/:id", verifyToken, deleteOrder);
-router.delete("/delete-all", verifyToken, deleteAllOrders);
+router.post("/create-order", verifyToken, verifyUser, createOrder);
+router.put("/update-order/:id", verifyToken, verifyAdmin, updateOrder);
+router.get("/get-all", verifyToken, verifyAdmin, fetchAllOrders);
+router.get("/get-one/:id", verifyToken, verifyAdmin, fetchOneOrder);
+router.delete("/delete-one/:id", verifyToken, verifyAdmin, deleteOrder);
+router.delete("/delete-all", verifyToken, verifyAdmin, deleteAllOrders);
 
 export default router;

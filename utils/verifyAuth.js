@@ -30,7 +30,7 @@ export const verifyToken = async (req, res, next) => {
 	}
 };
 
-export const verifyConsumer = (req, res, next) => {
+export const verifyUser = (req, res, next) => {
 	if (req.user.role !== "user") {
 		return res.status(403).json({ message: "Forbidden! Users only." });
 	}
