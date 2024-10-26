@@ -5,6 +5,7 @@ const authSchema = new mongoose.Schema(
 		username: { type: String, required: true },
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
+		role: { type: String, default: "user" },
 		avatar: {
 			type: String,
 			default:
@@ -20,6 +21,17 @@ const authSchema = new mongoose.Schema(
 	}
 );
 
-const Auth = mongoose.model("authMernTwo", authSchema);
+const AdminSchema = new mongoose.Schema(
+	{
+		username: { type: String, required: true },
+		email: { type: String, required: true },
+		password: { type: String, required: true },
+		role: { type: String, enum: ["admin", "manager"] },
+	},
+	{ timestamps: true }
+);
 
-export default Auth;
+const Auth = mongoose.model("authMernTwo", authSchema);
+const Admin = Auth.discriminator("adminMernTwo", AdminSchema);
+
+export default { Auth, Admin };
