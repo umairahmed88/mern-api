@@ -9,6 +9,7 @@ const sanitizeUser = (user) => ({
 	id: user._id,
 	username: user.username,
 	email: user.email,
+	role: user.role,
 	avatar: user.avatar,
 });
 
@@ -35,6 +36,7 @@ export const signup = async (req, res) => {
 				username,
 				email,
 				password: hashedPassword,
+				role,
 				avatar,
 			},
 			process.env.JWT_SECRET,

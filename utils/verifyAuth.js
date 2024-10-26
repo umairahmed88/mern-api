@@ -29,3 +29,17 @@ export const verifyToken = async (req, res, next) => {
 		res.status(500).json({ message: err.message });
 	}
 };
+
+export const verifyConsumer = (req, res, next) => {
+	if (req.user.role !== "user") {
+		return res.status(403).json({ message: "Forbidden! Users only." });
+	}
+	next();
+};
+
+export const verifyAdmin = (req, res, next) => {
+	if (req.user.role !== "admin") {
+		return res.status(403).json({ message: "Forbidden! Admins only." });
+	}
+	next();
+};
