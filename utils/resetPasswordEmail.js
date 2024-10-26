@@ -1,6 +1,6 @@
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Auth } from "../models/auth.model.js";
+import Auth from "../models/auth.model.js";
 import Token from "../models/token.model.js";
 
 export const resetPasswordEmail = async (req, res) => {
