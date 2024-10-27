@@ -7,6 +7,7 @@ import {
 	getAllProducts,
 	getOne,
 	increaseProduct,
+	searchProducts,
 	updateProduct,
 } from "../controllers/product.controllers.js";
 import { verifyAdmin, verifyToken } from "../utils/verifyAuth.js";
@@ -26,5 +27,6 @@ router.delete(
 	verifyAdmin,
 	deleteAllProducts
 );
+router.get("/search", searchProducts);
 
 export default router;
