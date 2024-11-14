@@ -271,6 +271,11 @@ export const updateUser = async (req, res) => {
 		}
 
 		if (password) {
+			const passwordError = isPasswordValid(password);
+			if (passwordError) {
+				return res.status(400).status({ message: passwordError });
+			}
+
 			req.body.password = bcryptjs.hashSync(password, 10);
 		}
 
