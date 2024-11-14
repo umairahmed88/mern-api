@@ -2,6 +2,7 @@ import { Auth } from "../models/auth.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
+import validator from "validator";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
