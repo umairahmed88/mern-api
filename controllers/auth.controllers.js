@@ -52,6 +52,8 @@ export const signup = async (req, res) => {
 			});
 		}
 
+		const role = req.body.role || "user";
+
 		const hashedPassword = bcryptjs.hashSync(password, 10);
 
 		const verificationToken = jwt.sign(
