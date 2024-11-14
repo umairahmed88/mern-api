@@ -5,6 +5,23 @@ import sgMail from "@sendgrid/mail";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+const isPasswordValid = (password) => {
+	if (!validator.isLength(password, { min: 8 }))
+		return "Password must be at least 8 characters long.";
+	if (!/[A-Z]/.test(password))
+		return "Password must contain at least one uppercase letter.";
+	if (!/[a-z]/.test(password))
+		return "Password must contain at least one lowercase letter.";
+	if (!/[0-9]/.test(password))
+		return "Password must contain at least one number.";
+	if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
+		return "Password must contain at least one special character.";
+	const commonPasswords = ["123456", "password", "12345678"];
+	if (commonPasswords.includes(password))
+		return "Please choose a stronger password.";
+	return null;
+};
+
 const sanitizeUser = (user) => ({
 	id: user._id,
 	username: user.username,
@@ -19,6 +36,11 @@ export const signup = async (req, res) => {
 
 		if (password !== confirmPassword) {
 			return res.status(400).json({ message: "Passwords do not match." });
+		}
+
+		const passwordError = isPasswordValid(password);
+		if (passwordError) {
+			return res.status(400).json({ message: passwordError });
 		}
 
 		const isUser = await Auth.findOne({ email });
